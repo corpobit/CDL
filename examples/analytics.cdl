@@ -1,0 +1,1 @@
+---posts:[t:uuid:id|t:datetime:posted|user|content|metrics|comments:P123,2025-05-19T12:00:00,Alice,"Hello, world!",(n:likes|n:shares|b:promoted:150,20,true),[(user|t:datetime:time|text:Bob,2025-05-19T12:05:00,"Great post!",Charlie,2025-05-19T12:10:00,"Agree!")],P456,2025-05-19T13:00:00,Bob,"Check this out",(n:likes|n:shares|b:promoted:80,10,false),[]]---
