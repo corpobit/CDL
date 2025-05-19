@@ -1,0 +1,1 @@
+---transactions:[t:uuid:id|t:datetime:time|customer|items:123e4567-e89b-12d3-a456-426614174000,2025-05-19T10:00:00,(name|email:Alice,"alice@example.com"),[(sku|n:price|n:qty:BOOK123,29.99,2,LAP456,999.99,1)],456e7890-e12b-45c6-b789-123456789012,2025-05-19T11:30:00,(name|email:Bob,"bob@example.com"),[(sku|n:price|n:qty:PHONE789,499.99,1)]]---
