@@ -1,0 +1,1 @@
+---config:(server|port|settings:prod,8080,(timeout|n:retries|"log level":30,3,debug),databases:[name|host:users,db1.local,orders,db2.local])---
