@@ -67,6 +67,3 @@ printTable([
     ['CDL', cdlSer.ms.toFixed(2), cdlDes.ms.toFixed(2), formatBytes(cdlSize)]
 ]);
 
-// Optionally, write the outputs to files for inspection
-// fs.writeFileSync('bigdata.json', jsonSer.result);
-// fs.writeFileSync('bigdata.cdl', cdlSer.result); 
