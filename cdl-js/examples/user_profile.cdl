@@ -1,0 +1,1 @@
+---user:(name|age|contact|preferences:John Doe,30,(email|phone|address:"john@example.com","+1234567890",(street|city|country:"123 Main St","New York","USA")),(theme|notifications|language:"dark",true,"en"))---

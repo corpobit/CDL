@@ -1,0 +1,24 @@
+{
+  "name": "cdl-js",
+  "version": "1.0.0",
+  "description": "Compact Data Language (CDL) JavaScript implementation",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "cdl",
+    "serialization",
+    "data-format",
+    "big-data"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.5"
+  }
+}
