@@ -1,1 +1,0 @@
----experiment:(id|t:datetime:start|parameters|results:EXP001,2025-05-19T09:00:00,(n:energy|n:temp:500.25,293.15),[(t:timestamp:time|t:measurement:values:1623456789,[n:1.234e-10,n:2.345e-9],1623456790,[n:1.456e-10,n:2.567e-9],1623456791,[n:1.678e-10,n:2.789e-9])])---
