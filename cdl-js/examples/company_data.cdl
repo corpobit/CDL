@@ -1,0 +1,1 @@
+---company:(name|employees|departments|stats:TechCorp,[name|role|skills:Alice,Developer,[JavaScript,Python,React],Bob,Designer,[UI,UX,Photoshop],Charlie,Manager,[Leadership,Project Management]],(engineering|design|marketing:(size|budget:50,1000000,20,500000,15,300000)),(revenue|profit|growth:10000000,2000000,15))---

@@ -1,0 +1,30 @@
+---sensor_network:(
+  name|locations|sensors|metadata:
+  "Smart Building Monitoring",
+  [zone|floor|area:
+    "North Wing",1,"Server Room",
+    "North Wing",1,"Office Space",
+    "South Wing",2,"Lab",
+    "South Wing",2,"Storage",
+    "East Wing",3,"Conference Room",
+    "West Wing",3,"Data Center"
+  ],
+  [id|type|location|readings|status:
+    "TEMP-001","temperature","North Wing/1/Server Room",[timestamp|value|unit:"2024-03-20T10:00:00Z",23.5,"C","2024-03-20T10:05:00Z",23.7,"C","2024-03-20T10:10:00Z",23.6,"C","2024-03-20T10:15:00Z",23.8,"C","2024-03-20T10:20:00Z",23.9,"C"],"active",
+    "HUM-001","humidity","North Wing/1/Server Room",[timestamp|value|unit:"2024-03-20T10:00:00Z",45.2,"%","2024-03-20T10:05:00Z",45.5,"%","2024-03-20T10:10:00Z",45.3,"%","2024-03-20T10:15:00Z",45.4,"%","2024-03-20T10:20:00Z",45.6,"%"],"active",
+    "PRESS-001","pressure","North Wing/1/Server Room",[timestamp|value|unit:"2024-03-20T10:00:00Z",1013.2,"hPa","2024-03-20T10:05:00Z",1013.3,"hPa","2024-03-20T10:10:00Z",1013.2,"hPa","2024-03-20T10:15:00Z",1013.4,"hPa","2024-03-20T10:20:00Z",1013.3,"hPa"],"active",
+    "TEMP-002","temperature","North Wing/1/Office Space",[timestamp|value|unit:"2024-03-20T10:00:00Z",22.1,"C","2024-03-20T10:05:00Z",22.2,"C","2024-03-20T10:10:00Z",22.3,"C","2024-03-20T10:15:00Z",22.2,"C","2024-03-20T10:20:00Z",22.4,"C"],"active",
+    "HUM-002","humidity","North Wing/1/Office Space",[timestamp|value|unit:"2024-03-20T10:00:00Z",48.5,"%","2024-03-20T10:05:00Z",48.7,"%","2024-03-20T10:10:00Z",48.6,"%","2024-03-20T10:15:00Z",48.8,"%","2024-03-20T10:20:00Z",48.9,"%"],"active",
+    "TEMP-003","temperature","South Wing/2/Lab",[timestamp|value|unit:"2024-03-20T10:00:00Z",21.8,"C","2024-03-20T10:05:00Z",21.9,"C","2024-03-20T10:10:00Z",22.0,"C","2024-03-20T10:15:00Z",21.9,"C","2024-03-20T10:20:00Z",22.1,"C"],"active",
+    "HUM-003","humidity","South Wing/2/Lab",[timestamp|value|unit:"2024-03-20T10:00:00Z",46.2,"%","2024-03-20T10:05:00Z",46.4,"%","2024-03-20T10:10:00Z",46.3,"%","2024-03-20T10:15:00Z",46.5,"%","2024-03-20T10:20:00Z",46.6,"%"],"active",
+    "PRESS-002","pressure","South Wing/2/Lab",[timestamp|value|unit:"2024-03-20T10:00:00Z",1013.1,"hPa","2024-03-20T10:05:00Z",1013.2,"hPa","2024-03-20T10:10:00Z",1013.3,"hPa","2024-03-20T10:15:00Z",1013.2,"hPa","2024-03-20T10:20:00Z",1013.4,"hPa"],"active",
+    "TEMP-004","temperature","South Wing/2/Storage",[timestamp|value|unit:"2024-03-20T10:00:00Z",20.5,"C","2024-03-20T10:05:00Z",20.6,"C","2024-03-20T10:10:00Z",20.7,"C","2024-03-20T10:15:00Z",20.6,"C","2024-03-20T10:20:00Z",20.8,"C"],"active",
+    "HUM-004","humidity","South Wing/2/Storage",[timestamp|value|unit:"2024-03-20T10:00:00Z",44.8,"%","2024-03-20T10:05:00Z",45.0,"%","2024-03-20T10:10:00Z",44.9,"%","2024-03-20T10:15:00Z",45.1,"%","2024-03-20T10:20:00Z",45.2,"%"],"active",
+    "TEMP-005","temperature","East Wing/3/Conference Room",[timestamp|value|unit:"2024-03-20T10:00:00Z",22.5,"C","2024-03-20T10:05:00Z",22.6,"C","2024-03-20T10:10:00Z",22.7,"C","2024-03-20T10:15:00Z",22.6,"C","2024-03-20T10:20:00Z",22.8,"C"],"active",
+    "HUM-005","humidity","East Wing/3/Conference Room",[timestamp|value|unit:"2024-03-20T10:00:00Z",47.2,"%","2024-03-20T10:05:00Z",47.4,"%","2024-03-20T10:10:00Z",47.3,"%","2024-03-20T10:15:00Z",47.5,"%","2024-03-20T10:20:00Z",47.6,"%"],"active",
+    "TEMP-006","temperature","West Wing/3/Data Center",[timestamp|value|unit:"2024-03-20T10:00:00Z",19.5,"C","2024-03-20T10:05:00Z",19.6,"C","2024-03-20T10:10:00Z",19.7,"C","2024-03-20T10:15:00Z",19.6,"C","2024-03-20T10:20:00Z",19.8,"C"],"active",
+    "HUM-006","humidity","West Wing/3/Data Center",[timestamp|value|unit:"2024-03-20T10:00:00Z",43.5,"%","2024-03-20T10:05:00Z",43.7,"%","2024-03-20T10:10:00Z",43.6,"%","2024-03-20T10:15:00Z",43.8,"%","2024-03-20T10:20:00Z",43.9,"%"],"active",
+    "PRESS-003","pressure","West Wing/3/Data Center",[timestamp|value|unit:"2024-03-20T10:00:00Z",1013.0,"hPa","2024-03-20T10:05:00Z",1013.1,"hPa","2024-03-20T10:10:00Z",1013.2,"hPa","2024-03-20T10:15:00Z",1013.1,"hPa","2024-03-20T10:20:00Z",1013.3,"hPa"],"active"
+  ],
+  (version|last_updated|total_sensors|total_readings:"1.0.0","2024-03-20T10:20:00Z",15,75)
+)---
