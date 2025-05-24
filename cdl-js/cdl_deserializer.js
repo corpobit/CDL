@@ -1,8 +1,6 @@
 class CDLDeserializer {
     deserialize(input) {
         input = input.trim();
-        console.log('CDL DEBUG deserialize input type:', typeof input);
-        console.log('CDL DEBUG deserialize input value:', input);
         if (typeof input !== 'string') throw new Error('Invalid CDL format');
 
         if (input === '------') return {};
@@ -12,7 +10,6 @@ class CDLDeserializer {
         }
 
         const content = input.slice(3, -3).trim();
-        console.log('CDL DEBUG content:', content);
 
         let inQuotes = false, depth = 0, splitIndex = -1;
         for (let i = 0; i < content.length; i++) {
@@ -41,8 +38,6 @@ class CDLDeserializer {
         } catch (e) {
             throw new Error('Invalid CDL format');
         }
-        console.log('CDL DEBUG keysPart:', keysPart);
-        console.log('CDL DEBUG valuesPart:', valuesPart);
         if (!keysPart.trim() || !valuesPart.trim()) {
             throw new Error('Invalid CDL format');
         }
@@ -92,8 +87,6 @@ class CDLDeserializer {
         let depth = 0;
         let splitIndex = -1;
 
-        console.log('CDL DEBUG safeSplitLastColon input:', input);
-
         for (let i = 0; i < input.length; i++) {
             const char = input[i];
             const prev = input[i - 1];
@@ -115,8 +108,6 @@ class CDLDeserializer {
                 splitIndex = i;
             }
         }
-
-        console.log('CDL DEBUG safeSplitLastColon splitIndex:', splitIndex);
 
         if (splitIndex === -1) {
             if (input.startsWith('(') && input.endsWith(')')) {
