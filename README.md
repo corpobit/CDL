@@ -1,5 +1,9 @@
 # Compact Data Language (CDL) Specification v2.0
 
+<div align="center">
+  <img src="logo/CDL-logo.png" alt="CDL Logo" width="200"/>
+</div>
+
 ## Introduction
 Compact Data Language (CDL) is a lightweight, human-readable data serialization format optimized for **big data storage and processing**, where **maximum compactness** is paramount. Designed for applications like data lakes, log files, scientific datasets, and large-scale analytics, CDL minimizes storage size through a space-free syntax and single-character delimiters. Unlike formats for real-time communication (e.g., JSON for APIs), CDL prioritizes reducing data footprint and enabling efficient batch processing, making it ideal for terabyte-scale datasets. CDL supports strings, numbers, booleans, nulls, objects, and arrays, ensuring reliability in big data pipelines.
 
