@@ -10,6 +10,52 @@ Compact Data Language (CDL) is a lightweight, human-readable data serialization 
 - **Readability**: Maintain human-readable keys for manual inspection, despite space-free design.
 - **Interoperability**: Map cleanly to JSON and big data tools (e.g., Hadoop, Spark).
 
+## Table of Contents
+1. [Specification](#specification)
+   - [Version Control](#version-control)
+   - [Core Principles](#core-principles)
+   - [Compliance Levels](#compliance-levels)
+2. [Syntax](#syntax)
+   - [General Structure](#general-structure)
+   - [Grammar](#grammar-bnf-like)
+   - [Keys](#keys)
+   - [Values](#values)
+   - [Comments](#comments)
+   - [Whitespace](#whitespace)
+3. [Semantics](#semantics)
+4. [Examples](#examples)
+   - [Basic Key-Value](#basic-key-value)
+   - [Nested Object](#nested-object)
+   - [Array](#array)
+5. [Parser Guidelines](#parser-guidelines)
+   - [Core Algorithm Pseudocode](#core-algorithm-pseudocode)
+     - [Serializer](#serializer)
+     - [Deserializer](#deserializer)
+     - [Deep Search](#deep-search)
+6. [Contributing](#contributing)
+   - [Code of Conduct](#code-of-conduct)
+   - [Contribution Process](#contribution-process)
+   - [Pull Request Guidelines](#pull-request-guidelines)
+   - [Development Setup](#development-setup)
+   - [Contact](#contact)
+   - [License](#license)
+7. [Interoperability](#interoperability)
+
+### Example
+```
+---users:[name|age:Alice,30,Bob,25]---
+```
+Maps to JSON:
+```json
+{
+  "users": [
+    { "name": "Alice", "age": 30 },
+    { "name": "Bob", "age": 25 }
+  ]
+}
+```
+CDL is ~36% smaller than minified JSON (35 chars vs. 58 chars) and avoids repetitive type prefixes, critical for big data.
+
 ## Specification
 
 ### Version Control
