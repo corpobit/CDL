@@ -61,6 +61,12 @@ jobs:
         CURRENT_VERSION=$(node -p "require('./package.json').version")
         echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
+    - name: Publish to npm
+      working-directory: cdl-js
+      run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
@@ -70,6 +76,7 @@ jobs:
           ## Changes in this Release
           - Automated release from main branch
           - Version: ${{ steps.get_version.outputs.current_version }}
+          - Published to npm
         draft: false
         prerelease: false
       env:
