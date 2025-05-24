@@ -37,8 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      issues: write
-      pull-requests: write
+      packages: write
 
     steps:
     - uses: actions/checkout@v4
@@ -62,26 +61,15 @@ jobs:
         CURRENT_VERSION=$(node -p "require('./package.json').version")
         echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
-    - name: Create Release Pull Request or Publish to npm
-      id: changesets
-      uses: changesets/action@v1
-      with:
-        publish: npm
-        commit: "chore: version packages"
-        title: "chore: version packages"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
     - name: Create GitHub Release
-      if: steps.changesets.outputs.published == 'true'
       uses: softprops/action-gh-release@v1
       with:
         name: Release v${{ steps.get_version.outputs.current_version }}
         tag_name: v${{ steps.get_version.outputs.current_version }}
         body: |
-          ## What's Changed
-          ${{ steps.changesets.outputs.publishedPackages }}
+          ## Changes in this Release
+          - Automated release from main branch
+          - Version: ${{ steps.get_version.outputs.current_version }}
         draft: false
         prerelease: false
       env:
