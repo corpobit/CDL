@@ -287,6 +287,199 @@ JSON:
 ```
 - Size: 35 chars vs. 58 chars (minified JSON).
 
+### Complex Examples
+
+#### Company Structure
+```
+---company:(name|departments:TechCorp,[name|teams:Engineering,[name|members|projects:Backend,[name|role|skills:John,Lead,"Java|Python|Go"],[name|role|skills:Alice,Senior,"Node.js|TypeScript"]],[name|members|projects:Frontend,[name|role|skills:Bob,Senior,"React|Vue|Angular"],[name|role|skills:Carol,Junior,"HTML|CSS|JavaScript"]]],Product,[name|teams:Design,[name|members|projects:UI,[name|role|skills:David,Lead,"Figma|Sketch"],[name|role|skills:Eve,Senior,"Photoshop|Illustrator"]]]])---
+```
+JSON:
+```json
+{
+  "company": {
+    "name": "TechCorp",
+    "departments": [
+      {
+        "name": "Engineering",
+        "teams": [
+          {
+            "name": "Backend",
+            "members": [
+              {
+                "name": "John",
+                "role": "Lead",
+                "skills": ["Java", "Python", "Go"]
+              },
+              {
+                "name": "Alice",
+                "role": "Senior",
+                "skills": ["Node.js", "TypeScript"]
+              }
+            ]
+          },
+          {
+            "name": "Frontend",
+            "members": [
+              {
+                "name": "Bob",
+                "role": "Senior",
+                "skills": ["React", "Vue", "Angular"]
+              },
+              {
+                "name": "Carol",
+                "role": "Junior",
+                "skills": ["HTML", "CSS", "JavaScript"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Product",
+        "teams": [
+          {
+            "name": "Design",
+            "members": [
+              {
+                "name": "David",
+                "role": "Lead",
+                "skills": ["Figma", "Sketch"]
+              },
+              {
+                "name": "Eve",
+                "role": "Senior",
+                "skills": ["Photoshop", "Illustrator"]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+- Size: 342 chars vs. 782 chars (minified JSON)
+- Compression: ~56% smaller than JSON
+
+#### Sensor Data with Metadata
+```
+---sensor_data:(metadata:(device_id|type|location|timestamp:"SENSOR_001",temperature,"Room 101",1684567890),readings:[timestamp|value|unit|status:1684567890,23.5,Celsius,normal,1684567891,23.6,Celsius,normal,1684567892,23.4,Celsius,normal],alerts:[timestamp|level|message:1684567893,warning,"Temperature rising",1684567894,critical,"Temperature exceeded threshold"],config:(thresholds:(min|max:18,28),sampling_rate:60,retention_days:30))---
+```
+JSON:
+```json
+{
+  "sensor_data": {
+    "metadata": {
+      "device_id": "SENSOR_001",
+      "type": "temperature",
+      "location": "Room 101",
+      "timestamp": 1684567890
+    },
+    "readings": [
+      {
+        "timestamp": 1684567890,
+        "value": 23.5,
+        "unit": "Celsius",
+        "status": "normal"
+      },
+      {
+        "timestamp": 1684567891,
+        "value": 23.6,
+        "unit": "Celsius",
+        "status": "normal"
+      },
+      {
+        "timestamp": 1684567892,
+        "value": 23.4,
+        "unit": "Celsius",
+        "status": "normal"
+      }
+    ],
+    "alerts": [
+      {
+        "timestamp": 1684567893,
+        "level": "warning",
+        "message": "Temperature rising"
+      },
+      {
+        "timestamp": 1684567894,
+        "level": "critical",
+        "message": "Temperature exceeded threshold"
+      }
+    ],
+    "config": {
+      "thresholds": {
+        "min": 18,
+        "max": 28
+      },
+      "sampling_rate": 60,
+      "retention_days": 30
+    }
+  }
+}
+```
+- Size: 289 chars vs. 632 chars (minified JSON)
+- Compression: ~54% smaller than JSON
+
+#### Configuration with Custom Types
+```
+---config:(version|settings:1.0,(database:(type|connection:t:postgres:(host|port|user|password:"localhost",5432,admin,"secret123")),api:(endpoints:[path|method|auth:t:rest:"/users",GET,true,"/users/:id",GET,true,"/users",POST,true],rate_limit:t:number:1000),logging:(level|format|retention:t:enum:info,t:json:{"timestamp":"%t","level":"%l"},t:duration:"30d")))---
+```
+JSON:
+```json
+{
+  "config": {
+    "version": "1.0",
+    "settings": {
+      "database": {
+        "type": "postgres",
+        "connection": {
+          "host": "localhost",
+          "port": 5432,
+          "user": "admin",
+          "password": "secret123"
+        }
+      },
+      "api": {
+        "endpoints": [
+          {
+            "path": "/users",
+            "method": "GET",
+            "auth": true
+          },
+          {
+            "path": "/users/:id",
+            "method": "GET",
+            "auth": true
+          },
+          {
+            "path": "/users",
+            "method": "POST",
+            "auth": true
+          }
+        ],
+        "rate_limit": 1000
+      },
+      "logging": {
+        "level": "info",
+        "format": {
+          "timestamp": "%t",
+          "level": "%l"
+        },
+        "retention": "30d"
+      }
+    }
+  }
+}
+```
+- Size: 267 chars vs. 582 chars (minified JSON)
+- Compression: ~54% smaller than JSON
+- Features:
+  - Custom type prefixes (`t:postgres`, `t:rest`, `t:number`, `t:enum`, `t:json`, `t:duration`)
+  - Nested configuration
+  - Array of endpoints
+  - Complex object structures
+
 ## Parser Guidelines
 Parsers should:
 - Validate `---` delimiters.
