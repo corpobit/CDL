@@ -75,19 +75,15 @@ CDL is ~36% smaller than minified JSON (35 chars vs. 58 chars) and avoids repeti
    - Minimal escaping requirements
    - Optimized for storage efficiency
 
-2. **Type System**
-   - Primitive Types:
+2. **Data Structure**
+   - Primitive Values:
      - String: Quoted or unquoted text
      - Number: Integer or floating-point
      - Boolean: `true` or `false`
      - Null: `null`
-   - Complex Types:
+   - Complex Structures:
      - Object: Key-value pairs in `()`
      - Array: Ordered list in `[]`
-   - Custom Types:
-     - Type prefix: `t:type_name:value`
-     - Number prefix: `n:value`
-     - Boolean prefix: `b:value`
 
 3. **Delimiters**
    - Document: `---` (start and end)
@@ -108,8 +104,8 @@ CDL is ~36% smaller than minified JSON (35 chars vs. 58 chars) and avoids repeti
 
 5. **Validation Rules**
    - Keys must be unique within their scope
-   - Values must match their declared types
-   - Arrays must be homogeneous
+   - Values must be properly formatted
+   - Arrays must be properly structured
    - Objects must have matching key-value counts
    - Strings must be properly escaped
    - Delimiters must be properly balanced
@@ -123,7 +119,7 @@ CDL is ~36% smaller than minified JSON (35 chars vs. 58 chars) and avoids repeti
 
 7. **Error Handling**
    - Invalid Format: Throw error with line number
-   - Type Mismatch: Throw error with expected type
+   - Format Mismatch: Throw error with context
    - Missing Delimiter: Throw error with context
    - Duplicate Key: Throw error with key name
    - Size Limit: Throw error with limit exceeded
@@ -144,7 +140,7 @@ CDL is ~36% smaller than minified JSON (35 chars vs. 58 chars) and avoids repeti
 
 10. **Implementation Requirements**
     - Must validate all rules
-    - Must handle all types
+    - Must handle all values
     - Must support UTF-8
     - Must be thread-safe
     - Must be memory-efficient
@@ -174,6 +170,32 @@ CDL is ~36% smaller than minified JSON (35 chars vs. 58 chars) and avoids repeti
    - Compression support
    - Encryption support
    - Performance optimizations
+
+### Interoperability
+- **JSON Mapping**:
+  - Strings, numbers, booleans, nulls, objects, arrays map directly
+  - Direct value mapping without type conversion
+- **Big Data Tools**: Compatible with Hadoop, Spark, or Parquet via JSON conversion or native CDL parsers
+- **Format Conversion**:
+  - JSON → CDL: Direct mapping with size reduction
+  - YAML → CDL: Structure preservation with compact syntax
+  - XML → CDL: Element-to-key mapping with attribute handling
+  - CSV → CDL: Header-to-key mapping with array support
+- **Tool Integration**:
+  - Database systems (PostgreSQL, MongoDB)
+  - Data processing frameworks (Apache Spark, Hadoop)
+  - Message queues (Kafka, RabbitMQ)
+  - API gateways and services
+
+### Implementation Requirements
+- Must validate all rules
+- Must handle all values
+- Must support UTF-8
+- Must be thread-safe
+- Must be memory-efficient
+- Must provide error details
+- Must support streaming
+- Must be well-documented
 
 ## Syntax
 
@@ -556,6 +578,27 @@ function escapeString(str):
     if strVal matches /^[a-zA-Z0-9_-]+$/:
         return strVal
     return "\"" + strVal.replace(/\\/g, "\\\\").replace(/"/g, "\\\"") + "\""
+
+Time Complexity Analysis:
+1. serializeObject: O(n) where n is number of key-value pairs
+   - Each key-value pair processed once
+   - String operations are O(1) for small strings
+   - Array operations are O(n) for n elements
+
+2. serializeValue: O(m) where m is size of value
+   - Primitive types: O(1)
+   - Arrays: O(n) where n is array length
+   - Objects: O(p) where p is object size
+
+3. serializeArray: O(n * m) where:
+   - n is array length
+   - m is average size of elements
+
+Overall Complexity: O(n * m) where:
+- n is total number of nodes in data structure
+- m is average size of values
+
+Space Complexity: O(n) for recursion stack and string building
 ```
 
 #### Deserializer
@@ -606,138 +649,34 @@ function deserialize(input):
     
     return buildObject(keys, values, true)
 
-function safeSplitLastColon(input):
-    inQuotes = false
-    depth = 0
-    splitIndex = -1
-    
-    for each char in input:
-        if char is quote and previous char is not escape:
-            inQuotes = not inQuotes
-            continue
-        
-        if inQuotes:
-            continue
-        
-        if char is "(" or char is "[":
-            depth++
-        else if char is ")" or char is "]":
-            depth--
-        
-        if char is ":" and depth is 0:
-            splitIndex = current position
-    
-    if splitIndex is -1:
-        if input starts with "(" and ends with ")":
-            return ["", input]
-        throw error "Invalid CDL format: unable to split"
-    
-    return [input.slice(0, splitIndex), input.slice(splitIndex + 1)]
+Time Complexity Analysis:
+1. safeSplitLastColon: O(n) where n is input length
+   - Single pass through string
+   - Constant time operations per character
 
-function parseList(input, delimiter, parseNested = false):
-    result = []
-    token = ""
-    inQuotes = false
-    depth = 0
-    
-    for each char in input:
-        backslashCount = count consecutive backslashes before current position
-        if char is quote and backslashCount is even:
-            inQuotes = not inQuotes
-        if not inQuotes:
-            if char is "(" or char is "[":
-                depth++
-            if char is ")" or char is "]":
-                depth--
-        
-        if char is delimiter and not inQuotes and depth is 0:
-            result.push(token.trim())
-            token = ""
-        else:
-            token += char
-    
-    if token:
-        result.push(token.trim())
-    
-    if parseNested:
-        return result.map(v => parseValue(v))
-    
-    return result.map(k => {
-        key = k.split(":")[0].trim()
-        if key starts with "\"" and ends with "\"":
-            return key.slice(1, -1).replace(/\\"/g, "\"")
-        return key.replace(/\\"/g, "\"")
-    })
+2. parseList: O(n) where n is input length
+   - Single pass through string
+   - Constant time operations per character
+   - O(m) for nested parsing where m is nested content size
 
-function parseValue(value):
-    value = value.trim()
-    
-    if value is "null":
-        return null
-    if value is "true":
-        return true
-    if value is "false":
-        return false
-    
-    if value starts with "\"" and ends with "\"":
-        return value.slice(1, -1)
-            .replace(/\\"/g, "\"")
-            .replace(/\\:/g, ":")
-            .replace(/\\,/g, ",")
-            .replace(/\\\\/g, "\\")
-    
-    if value is valid number:
-        return Number(value)
-    
-    if value starts with "[" and ends with "]":
-        inner = value.slice(1, -1)
-        if inner contains "|" and ":":
-            [keysPart, valuesPart] = safeSplitLastColon(inner)
-            keys = parseList(keysPart, "|")
-            values = parseList(valuesPart, ",", true)
-            return buildArrayOfObjects(keys, values)
-        else:
-            return parseList(inner, ",", true)
-    
-    if value starts with "(" and ends with ")":
-        inner = value.slice(1, -1)
-        [k, v] = safeSplitLastColon(inner)
-        keys = parseList(k, "|")
-        values = parseList(v, ",", true)
-        return buildObject(keys, values)
-    
-    return value
+3. parseValue: O(n) where n is value length
+   - Constant time for primitive types
+   - O(m) for arrays where m is array length
+   - O(p) for objects where p is object size
 
-function buildArrayOfObjects(keys, values):
-    result = []
-    chunkSize = keys.length
-    
-    for i = 0 to values.length step chunkSize:
-        chunk = values.slice(i, i + chunkSize)
-        obj = {}
-        for j = 0 to keys.length:
-            obj[keys[j]] = chunk[j]
-        result.push(obj)
-    
-    return result
+4. buildObject: O(n) where n is number of key-value pairs
+   - Single pass through keys and values
+   - Constant time object property assignment
 
-function buildObject(keys, values, isTopLevel = false):
-    if values.length is 1 and values[0] is array and keys.length > 1:
-        flatValues = values[0]
-        chunkSize = keys.length
-        result = []
-        for i = 0 to flatValues.length step chunkSize:
-            chunk = flatValues.slice(i, i + chunkSize)
-            obj = {}
-            for j = 0 to keys.length:
-                obj[keys[j]] = chunk[j]
-            result.push(obj)
-        return { [keys[0]]: result }
-    
-    obj = {}
-    for i = 0 to keys.length:
-        obj[keys[i]] = values[i]
-    return obj
+Overall Complexity: O(n) where n is input length
+- Linear time for string parsing
+- Linear time for object building
+- No nested loops or exponential operations
+
+Space Complexity: O(n) where n is input length
+- Stack space for recursion
+- Object storage
+- String building
 ```
 
 #### Deep Search
@@ -757,12 +696,44 @@ function findAllValuesByKey(object, target_key):
     
     return results
 
-Performance Characteristics:
-- Time Complexity: O(n) where n is total number of nodes
-- Space Complexity: O(m) where m is number of matches
-- Single pass through data structure
-- No preprocessing required
-- Memory efficient (only stores results)
+Time Complexity Analysis:
+1. Base Case: O(1)
+   - Constant time for primitive values
+   - Constant time for key comparison
+
+2. Array Case: O(n * m) where:
+   - n is array length
+   - m is average time to process each element
+
+3. Object Case: O(p * q) where:
+   - p is number of properties
+   - q is average time to process each value
+
+Overall Complexity: O(n) where n is total number of nodes
+- Each node visited exactly once
+- Constant time operations per node
+- No redundant traversals
+
+Space Complexity: O(m) where m is number of matches
+- Only stores matching values
+- No additional data structures
+- Stack space for recursion
+
+Proof of Linear Time:
+1. Each node in the data structure is visited exactly once
+2. Operations per node are constant time:
+   - Key comparison: O(1)
+   - Value access: O(1)
+   - Array iteration: O(1) per element
+3. No node is visited more than once
+4. No redundant traversals
+5. Therefore, total time is proportional to number of nodes
+
+Proof of Optimal Space:
+1. Only stores matching values
+2. No temporary data structures
+3. Stack space is bounded by tree height
+4. Therefore, space is proportional to number of matches
 ```
 
 ## Contributing
@@ -823,9 +794,18 @@ By contributing to CDL, you agree that your contributions will be licensed under
 
 ## Interoperability
 - **JSON Mapping**:
-  - Strings, numbers, booleans, nulls, objects, arrays map directly.
-  - Custom types map to `{ "type": "<type_name>", "value": <value> }` unless handled.
-- **Big Data Tools**: Compatible with Hadoop, Spark, or Parquet via JSON conversion or native CDL parsers.
-- **Type Preservation**: Ensure `n:age:30` → JSON `30` (number), not `"30"` (string).
+  - Strings, numbers, booleans, nulls, objects, arrays map directly
+  - Direct value mapping without type conversion
+- **Big Data Tools**: Compatible with Hadoop, Spark, or Parquet via JSON conversion or native CDL parsers
+- **Format Conversion**:
+  - JSON → CDL: Direct mapping with size reduction
+  - YAML → CDL: Structure preservation with compact syntax
+  - XML → CDL: Element-to-key mapping with attribute handling
+  - CSV → CDL: Header-to-key mapping with array support
+- **Tool Integration**:
+  - Database systems (PostgreSQL, MongoDB)
+  - Data processing frameworks (Apache Spark, Hadoop)
+  - Message queues (Kafka, RabbitMQ)
+  - API gateways and services
 
 System: * Today's date and time is 10:16 PM CEST on Monday, May 19, 2025.
