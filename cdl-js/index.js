@@ -34,37 +34,90 @@ function createTable(headers, rows, options = {}) {
     return table;
 }
 
+function measureSearchTime(data, key) {
+    // Warm-up run to avoid cold start bias
+    findAllValuesByKey(data, key);
+    
+    const iterations = 1000; // Run multiple times for more accurate measurement
+    let totalTime = 0n;
+    let minTime = BigInt(Number.MAX_SAFE_INTEGER);
+    let maxTime = 0n;
+    
+    for (let i = 0; i < iterations; i++) {
+        const start = process.hrtime.bigint();
+        const results = findAllValuesByKey(data, key);
+        const end = process.hrtime.bigint();
+        const time = end - start;
+        
+        totalTime += time;
+        if (time < minTime) minTime = time;
+        if (time > maxTime) maxTime = time;
+        
+        if (i === 0) {
+            // Store results from first iteration
+            var firstResults = results;
+        }
+    }
+    
+    const avgTimeInMs = Number(totalTime) / iterations / 1_000_000;
+    const minTimeInMs = Number(minTime) / 1_000_000;
+    const maxTimeInMs = Number(maxTime) / 1_000_000;
+    
+    return {
+        results: firstResults,
+        metrics: {
+            avgTime: avgTimeInMs.toFixed(3),
+            minTime: minTimeInMs.toFixed(3),
+            maxTime: maxTimeInMs.toFixed(3),
+            iterations
+        }
+    };
+}
+
 function demonstrateCDL(filename) {
-    printHeader(`Demonstrating ${filename}`);
+    printHeader(`Analyzing ${filename}`);
     try {
         const cdlContent = readCDLFile(filename);
-        console.log(chalk.green('CDL Content:'));
-        console.log(chalk.gray(cdlContent));
-        
         const deserialized = deserializer.deserialize(cdlContent);
-        console.log(chalk.green('\nDeserialized Object:'));
-        console.log(JSON.stringify(deserialized, null, 2));
         
         printSubsection('Key Analysis');
+        const performanceSummary = [];
+        
         for (const key of ['name', 'email', 'skills']) {
-            const found = findAllValuesByKey(deserialized, key);
+            const { results: found, metrics } = measureSearchTime(deserialized, key);
             if (found.length > 0) {
                 console.log(chalk.blue(`\nAll values for key '${key}':`));
-                const table = createTable(['Index', 'Value'], 
-                    found.map((v, i) => [i + 1, JSON.stringify(v)]));
+                const table = createTable(['Index', 'Value', 'Search Time (avg)'], 
+                    found.map((v, i) => [i + 1, JSON.stringify(v), i === 0 ? `${metrics.avgTime}ms` : '']));
                 console.log(table.toString());
+                
+                performanceSummary.push({
+                    key,
+                    count: found.length,
+                    avgTime: metrics.avgTime,
+                    minTime: metrics.minTime,
+                    maxTime: metrics.maxTime
+                });
             }
         }
         
-        const serialized = serializer.serialize(deserialized);
-        console.log(chalk.green('\nReserialized CDL:'));
-        console.log(chalk.gray(serialized));
-        
-        console.log(chalk.green('\nRound-trip verification:'));
-        console.log(chalk.yellow('Original and reserialized match:'), 
-            cdlContent === serialized ? chalk.green('✓') : chalk.red('✗'));
+        // Print performance summary
+        if (performanceSummary.length > 0) {
+            printSubsection('Search Performance Summary');
+            const summaryTable = createTable(
+                ['Key', 'Results', 'Avg Time (ms)', 'Min Time (ms)', 'Max Time (ms)'],
+                performanceSummary.map(summary => [
+                    summary.key,
+                    summary.count,
+                    summary.avgTime,
+                    summary.minTime,
+                    summary.maxTime
+                ])
+            );
+            console.log(summaryTable.toString());
+        }
     } catch (e) {
-        console.error(chalk.red('Error during demonstration:'), e);
+        console.error(chalk.red('Error during analysis:'), e);
     }
 }
 
@@ -133,14 +186,12 @@ function analyzeSensorData(data) {
     console.log(latestReadingsTable.toString());
 }
 
-printHeader('CDL Serialization/Deserialization Examples');
-å
+printHeader('CDL Search Performance Analysis');
 demonstrateCDL('user_profile.cdl');
 demonstrateCDL('company_data.cdl');
 demonstrateCDL('configuration.cdl');
-demonstrateCDL('test_cpp.cdl');
 
-printHeader('Complex Example');
+printHeader('Complex Data Analysis');
 const complexData = {
     project: {
         name: "Web Application",
@@ -180,36 +231,78 @@ const complexData = {
     }
 };
 
-console.log(chalk.green('Original Object:'));
-console.log(JSON.stringify(complexData, null, 2));
-
-const serializedComplex = serializer.serialize(complexData);
-console.log(chalk.green('\nSerialized CDL:'));
-console.log(chalk.gray(serializedComplex));
-
-const deserializedComplex = deserializer.deserialize(serializedComplex);
-console.log(chalk.green('\nDeserialized Object:'));
-console.log(JSON.stringify(deserializedComplex, null, 2));
+const deserializedComplex = deserializer.deserialize(serializer.serialize(complexData));
 
 printSubsection('Key Analysis');
 for (const key of ['name', 'skills']) {
-    const found = findAllValuesByKey(deserializedComplex, key);
+    const { results: found, metrics } = measureSearchTime(deserializedComplex, key);
     if (found.length > 0) {
         console.log(chalk.blue(`\nAll values for key '${key}':`));
-        const table = createTable(['Index', 'Value'], 
-            found.map((v, i) => [i + 1, JSON.stringify(v)]));
+        const table = createTable(['Index', 'Value', 'Search Time (avg)'], 
+            found.map((v, i) => [i + 1, JSON.stringify(v), i === 0 ? `${metrics.avgTime}ms` : '']));
         console.log(table.toString());
     }
 }
 
-console.log(chalk.green('\nRound-trip verification:'));
-console.log(chalk.yellow('Objects match:'), 
-    JSON.stringify(complexData) === JSON.stringify(deserializedComplex) ? chalk.green('✓') : chalk.red('✗'));
-
-demonstrateCDL('long_repetitive.cdl');
-
 demonstrateCDL('sensor_data.cdl');
 const sensorData = deserializer.deserialize(readCDLFile('sensor_data.cdl'));
 analyzeSensorData(sensorData);
+
+printHeader('Deep Search Analysis');
+const deepSearchFiles = [
+    'company_data.cdl',
+    'sensor_data.cdl',
+    'configuration.cdl',
+    'user_profile.cdl',
+    'long_repetitive.cdl'
+];
+
+for (const filename of deepSearchFiles) {
+    printSubsection(`Analyzing ${filename}`);
+    const cdlContent = readCDLFile(filename);
+    const deserialized = deserializer.deserialize(cdlContent);
+    
+    // Search for keys that are likely to be deeply nested
+    const keysToSearch = [
+        'name', 'value', 'type', 'status', 'settings', 'config',
+        'email', 'skills', 'tasks', 'location', 'data', 'parameters',
+        'options', 'metadata', 'properties', 'attributes'
+    ];
+    const performanceSummary = [];
+    
+    for (const key of keysToSearch) {
+        const { results: found, metrics } = measureSearchTime(deserialized, key);
+        if (found.length > 0) {
+            console.log(chalk.blue(`\nAll values for key '${key}':`));
+            const table = createTable(['Index', 'Value', 'Search Time (avg)'], 
+                found.map((v, i) => [i + 1, JSON.stringify(v), i === 0 ? `${metrics.avgTime}ms` : '']));
+            console.log(table.toString());
+            
+            performanceSummary.push({
+                key,
+                count: found.length,
+                avgTime: metrics.avgTime,
+                minTime: metrics.minTime,
+                maxTime: metrics.maxTime
+            });
+        }
+    }
+    
+    // Print performance summary for this file
+    if (performanceSummary.length > 0) {
+        printSubsection('Search Performance Summary');
+        const summaryTable = createTable(
+            ['Key', 'Results', 'Avg Time (ms)', 'Min Time (ms)', 'Max Time (ms)'],
+            performanceSummary.map(summary => [
+                summary.key,
+                summary.count,
+                summary.avgTime,
+                summary.minTime,
+                summary.maxTime
+            ])
+        );
+        console.log(summaryTable.toString());
+    }
+}
 
 
